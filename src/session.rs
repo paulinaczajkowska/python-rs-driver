@@ -1,12 +1,12 @@
 use std::fmt::Write;
 use std::sync::Arc;
 
+use crate::RUNTIME;
+use crate::serialize::PyAnyWrapper;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pyo3::types::PyString;
 use scylla::value::Row;
-
-use crate::RUNTIME;
 
 #[pyclass]
 pub(crate) struct Session {
@@ -29,7 +29,28 @@ impl Session {
             })
             .await
             .expect("Driver should not panic")?;
-        return Ok(RequestResult { inner: result });
+        Ok(RequestResult { inner: result })
+    }
+
+    async fn execute_with_values(
+        &self,
+        request: Py<PyString>,
+        values: Py<PyAny>,
+    ) -> PyResult<RequestResult> {
+        let request_string = Python::with_gil(|py| request.to_str(py))?.to_string();
+        let session_clone = Arc::clone(&self._inner);
+        let result = RUNTIME
+            .spawn(async move {
+                session_clone
+                    .query_unpaged(request_string, PyAnyWrapper(values))
+                    .await
+                    .map_err(|e| {
+                        PyRuntimeError::new_err(format!("Failed to deserialize metadata: {}", e))
+                    })
+            })
+            .await
+            .expect("Driver should not panic")?;
+        Ok(RequestResult { inner: result })
     }
 }
 
@@ -40,7 +61,7 @@ pub(crate) struct RequestResult {
 
 #[pymethods]
 impl RequestResult {
-    fn __str__<'s, 'gil>(&'s mut self, py: Python<'gil>) -> PyResult<Bound<'gil, PyString>> {
+    fn __str__<'gil>(&mut self, py: Python<'gil>) -> PyResult<Bound<'gil, PyString>> {
         let mut result = String::new();
         let rows_result = match self.inner.clone().into_rows_result() {
             Ok(r) => r,
@@ -66,9 +87,9 @@ impl RequestResult {
                 };
                 write!(result, "|").unwrap();
             }
-            write!(result, "\n").unwrap();
+            writeln!(result).unwrap();
         }
-        return Ok(PyString::new(py, &result));
+        Ok(PyString::new(py, &result))
     }
 }
 

@@ -705,7 +705,7 @@ dependencies = [
 [[package]]
 name = "scylla"
 version = "1.4.1"
-source = "git+https://github.com/scylladb/scylla-rust-driver?branch=main#9306a355c06c6e75f9b6be2a1f6b6883bd7ae8fd"
+source = "git+https://github.com/patrycja-ziemkiewicz/scylla-rust-driver.git?branch=feature%2Fpublic-methods#be5d8f13cca84036cc3b6c20c88d5c6c621d5b12"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -729,7 +729,7 @@ dependencies = [
 [[package]]
 name = "scylla-cql"
 version = "1.4.0"
-source = "git+https://github.com/scylladb/scylla-rust-driver?branch=main#9306a355c06c6e75f9b6be2a1f6b6883bd7ae8fd"
+source = "git+https://github.com/patrycja-ziemkiewicz/scylla-rust-driver.git?branch=feature%2Fpublic-methods#be5d8f13cca84036cc3b6c20c88d5c6c621d5b12"
 dependencies = [
  "byteorder",
  "bytes",
@@ -748,7 +748,7 @@ dependencies = [
 [[package]]
 name = "scylla-macros"
 version = "1.4.0"
-source = "git+https://github.com/scylladb/scylla-rust-driver?branch=main#9306a355c06c6e75f9b6be2a1f6b6883bd7ae8fd"
+source = "git+https://github.com/patrycja-ziemkiewicz/scylla-rust-driver.git?branch=feature%2Fpublic-methods#be5d8f13cca84036cc3b6c20c88d5c6c621d5b12"
 dependencies = [
  "darling",
  "proc-macro2",
